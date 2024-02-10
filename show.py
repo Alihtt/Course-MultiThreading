@@ -1,30 +1,19 @@
 from time import sleep, perf_counter
-from threading import Thread, current_thread, enumerate
+from concurrent.futures import ThreadPoolExecutor
 
 start = perf_counter()
 
 
-def show(name, delay):
+def show(name):
     print(f'Starting {name}...')
-
-    print(current_thread())  # Return the current thread
-    print(enumerate())  # Return all alive threads
-    
-    sleep(delay)
+    sleep(3)
     print(f'Finished {name}.')
 
 
-# Creating threads instance
-th1 = Thread(name='First', target=show, args=('One', 3))
-th2 = Thread(name='Second', target=show, args=('Two', 7))
-
-# Starting threads
-th1.start()
-th2.start()
-
-# Waiting until threads are finished
-th1.join()
-th2.join()
+# For large amount of threads we use ThreadPoolExecutor
+with ThreadPoolExecutor(max_workers=5) as executor:
+    names = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten']
+    executor.map(show, names)
 
 end = perf_counter()
 print(round(end - start))
