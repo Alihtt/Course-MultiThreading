@@ -1,5 +1,6 @@
 from time import sleep, perf_counter
 from threading import Thread
+import sys
 
 start = perf_counter()
 
@@ -10,27 +11,23 @@ def show(name, delay):
     print(f'Finished {name}.')
 
 
-class ShowThread(Thread):
-    def __init__(self, name, delay):
-        super().__init__()
-        self.name = name
-        self.delay = delay
-
-    def run(self):
-        show(self.name, self.delay)
-
-
 # Creating threads instance
-th1 = ShowThread('One', 3)
-th2 = ShowThread('Two', 7)
+th1 = Thread(target=show, args=('One', 3), daemon=True)
+th2 = Thread(target=show, args=('Two', 7), daemon=True)
 
 # Starting threads
 th1.start()
 th2.start()
 
-# Waiting until threads are finished
-th1.join()
-th2.join()
-
 end = perf_counter()
 print(round(end - start))
+
+"""
+daemon note
+
+if daemon == True:
+    print('the thread does not wait for the answer and run sys.exit()')
+else:
+    print('the thread waits for the answer and after receiving the answer runs sys.exit()')
+"""
+sys.exit()
