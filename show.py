@@ -1,36 +1,44 @@
-from threading import Thread, RLock
+from threading import Thread, Semaphore, current_thread
+from time import sleep
 
 num = 0
-lock = RLock()
+lock = Semaphore(value=2)
 """
-If our program is reentrant we need to use RLock to acquired multiple times by the same thread 
+When we have limit to shared source we have use Semaphore to apply limit for accessing to shared source
 """
 
 
 def add():
     global num
-    with lock:
-        subtract()
-        for _ in range(100000):
-            num += 1
+    lock.acquire()
+    print(current_thread().name)
+    sleep(2)
+    num += 1
+    lock.release()
 
 
-def subtract():
-    global num
-    with lock:
-        for _ in range(100000):
-            num -= 1
-
-
-def both():
-    subtract()
-    add()
-
-
-th1 = Thread(target=both)
+th1 = Thread(target=add)
+th2 = Thread(target=add)
+th3 = Thread(target=add)
+th4 = Thread(target=add)
+th5 = Thread(target=add)
+th6 = Thread(target=add)
+th7 = Thread(target=add)
 
 th1.start()
+th2.start()
+th3.start()
+th4.start()
+th5.start()
+th6.start()
+th7.start()
 
 th1.join()
+th2.join()
+th3.join()
+th4.join()
+th5.join()
+th6.join()
+th7.join()
 
 print(f'Finished. Your number is {num}')
