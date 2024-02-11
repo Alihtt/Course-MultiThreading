@@ -1,17 +1,16 @@
-from threading import Thread, Lock
+from threading import Thread, RLock
 
 num = 0
-lock = Lock()
+lock = RLock()
 """
-If we are working on one source in multiple functions like {num} in add and subtract 
-it can be race condition and return nonsense answer, for avoiding that our program need to be thread safe
-we have to use lock in each function to lock the thread and after finishing thread next function will be start in other hand respect each other
+If our program is reentrant we need to use RLock to acquired multiple times by the same thread 
 """
 
 
 def add():
     global num
     with lock:
+        subtract()
         for _ in range(100000):
             num += 1
 
@@ -23,13 +22,15 @@ def subtract():
             num -= 1
 
 
-th1 = Thread(target=add)
-th2 = Thread(target=subtract)
+def both():
+    subtract()
+    add()
+
+
+th1 = Thread(target=both)
 
 th1.start()
-th2.start()
 
 th1.join()
-th2.join()
 
 print(f'Finished. Your number is {num}')
